@@ -17,31 +17,17 @@ function VideoResult({ video }) {
     }
   };
 
-  const formatVideoLength = (seconds) => {
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-
-    return hrs > 0
-      ? `${hrs}:${mins.toString().padStart(2, "0")}:${secs
-          .toString()
-          .padStart(2, "0")}`
-      : `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
   return (
     <div className="flex flex-col items-center gap-2">
       <img
-        src={video.thumbnails[4].url || YoutubeLogo}
+        src={video.thumbnails || YoutubeLogo}
         alt="Video Thumbnail"
         className="w-80 h-45 object-cover rounded-lg"
       />
 
       <div className="w-80 flex justify-between">
         <h1 className="text-sm font-bold text-customWhite">{video.title}</h1>
-        <h1 className="text-sm text-customGray-lighter">
-          {formatVideoLength(video.lengthSeconds)}
-        </h1>
+        <h1 className="text-sm text-customGray-lighter">{video.duration}</h1>
       </div>
 
       <button
