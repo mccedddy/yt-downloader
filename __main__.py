@@ -17,7 +17,6 @@ if getattr(sys, 'frozen', False):
     # If the application is run as an executable
     icon_path = os.path.join(sys._MEIPASS, 'icon.ico')
     header_image_path = os.path.join(sys._MEIPASS, 'icon.png')
-
 else:
     # If the application is run in a regular Python environment
     icon_path = os.path.join(os.getcwd(), 'icon.ico')
