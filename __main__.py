@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 import yt_dlp
 import os
+import sys
 from PIL import Image, ImageTk
 
 # Create main window
@@ -11,8 +12,20 @@ root.geometry("550x380")
 root.resizable(False, False) 
 root.configure(bg="#121212")
 
-# Window icon
-root.iconbitmap(os.path.join(os.getcwd(),'icon.ico'))
+# Get the absolute path of the icon file relative to the executable
+if getattr(sys, 'frozen', False):
+    # If the application is run as an executable
+    icon_path = os.path.join(sys._MEIPASS, 'icon.ico')
+    header_image_path = os.path.join(sys._MEIPASS, 'icon.png')
+
+else:
+    # If the application is run in a regular Python environment
+    icon_path = os.path.join(os.getcwd(), 'icon.ico')
+    header_image_path = os.path.join(os.getcwd(), 'icon.png')
+
+
+# Set the window icon
+root.iconbitmap(icon_path)
 
 # Video data
 yt_url = ""
@@ -95,7 +108,6 @@ output_frame = tk.Frame(root, bg="#272727", bd=0)
 folder_frame = tk.Frame(root, bg="#272727", bd=0)
 
 # Header
-header_image_path = os.path.join(os.getcwd(), 'icon.png')
 if os.path.exists(header_image_path):
     header_image = Image.open(header_image_path)
     header_image = header_image.resize((40, 40), Image.LANCZOS)
