@@ -2,11 +2,17 @@ import tkinter as tk
 from tkinter import messagebox
 import yt_dlp
 import os
+from PIL import Image, ImageTk
 
 # Create main window
 root = tk.Tk()
 root.title("YouTube Downloader")
-root.geometry("400x300")
+root.geometry("550x380")
+root.resizable(False, False) 
+root.configure(bg="#121212")
+
+# Window icon
+root.iconbitmap(os.path.join(os.getcwd(),'icon.ico'))
 
 # Video data
 yt_url = ""
@@ -14,8 +20,6 @@ video_info = {}
 
 # Define download folder path
 DOWNLOAD_PATH = os.path.join(os.getcwd(), "downloads")
-
-# Ensure the downloads folder exists
 if not os.path.exists(DOWNLOAD_PATH):
     os.makedirs(DOWNLOAD_PATH)
 
@@ -40,13 +44,11 @@ def fetch_video():
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             video_info = ydl.extract_info(yt_url, download=False)
-        
-        # Display video details
+
         video_title_label.config(text=video_info['title'])
         video_duration_label.config(text=format_duration(video_info['duration']))
 
-        # Show the download button
-        download_button.pack(pady=10)  
+        output_frame.pack(pady=10)
 
     except Exception as e:
         messagebox.showerror("Error", f"Failed to fetch video: {e}")
@@ -60,14 +62,11 @@ def download_video():
         return
 
     try:
-        # Set options to download in MP4 format without merging
         ydl_opts = {
-            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
+            'format': 'best[ext=mp4]',
             'outtmpl': os.path.join(DOWNLOAD_PATH, '%(title)s.%(ext)s'),
             'noplaylist': True,
         }
-
-        ydl_opts['format'] = 'best[ext=mp4]'
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([yt_url])
@@ -81,25 +80,57 @@ def reset_video():
     video_duration_label.config(text="")
     download_button.pack_forget()
 
-# URL textbox
-tk.Label(root, text="YouTube URL:").pack(pady=5)
-url_entry = tk.Entry(root, width=50)
-url_entry.pack(pady=5)
-url_entry.bind("<KeyRelease>", lambda e: reset_video())
+def open_folder():
+    os.startfile(DOWNLOAD_PATH)
 
-# Submit button
-submit_button = tk.Button(root, text="Submit", command=fetch_video)
-submit_button.pack(pady=10)
+# Frames
+header_frame = tk.Frame(root, bg="#121212", bd=0)
+header_frame.pack(pady=(40, 20))
+
+input_frame = tk.Frame(root, bg="#121212", bd=0)
+input_frame.pack(pady=10)
+
+output_frame = tk.Frame(root, bg="#272727", bd=0)
+
+folder_frame = tk.Frame(root, bg="#272727", bd=0)
+
+# Header
+header_image_path = os.path.join(os.getcwd(), 'icon.png')
+if os.path.exists(header_image_path):
+    header_image = Image.open(header_image_path)
+    header_image = header_image.resize((40, 40), Image.LANCZOS)
+    header_image = ImageTk.PhotoImage(header_image)
+
+    image_label = tk.Label(header_frame, image=header_image, bg="#121212")
+    image_label.pack(side=tk.LEFT, padx=(0, 10))
+else:
+    print(f"Image file not found at {header_image_path}")
+
+header_label = tk.Label(header_frame, text="YouTube Downloader", bg="#121212", fg="white", font=('Helvetica', 20))
+header_label.pack(side=tk.RIGHT)
+
+# URL textbox with padding
+url_entry = tk.Entry(input_frame, width=40, bg="#272727", fg="white", bd=5, insertbackground='white', relief="flat", font=('Helvetica', 12))
+url_entry.pack(side=tk.LEFT, padx=(0, 10))
+
+# Search button
+search_button = tk.Button(input_frame, text="Search", bg="#272727", fg="white", command=fetch_video, bd=3, relief="flat", font=('Helvetica', 10))
+search_button.pack(side=tk.LEFT)
 
 # Video details
-video_title_label = tk.Label(root, text="")
-video_title_label.pack(pady=3)
+video_title_label = tk.Label(output_frame, text="", bg="#272727", fg="white", font=('Helvetica', 12))
+video_title_label.pack(pady=(10, 3), padx=10)
 
-video_duration_label = tk.Label(root, text="")
+video_duration_label = tk.Label(output_frame, text="", bg="#272727", fg="white", font=('Helvetica', 12))
 video_duration_label.pack(pady=3)
 
 # Download button (initially hidden)
-download_button = tk.Button(root, text="Download", command=download_video)
+download_button = tk.Button(output_frame, width=12, text="Download", bg="#FF0033", fg="white",  relief="flat", command=download_video, font=('Helvetica', 12))
+download_button.pack(pady=(10,20))
+
+# Folder button
+folder_button = tk.Button(root, text="Open downloads folder", bg="#121212", fg="gray", command=open_folder, bd=3, relief="flat", font=('Helvetica', 10))
+folder_button.pack(pady=0)
 
 # Tkinter loop
 root.mainloop()
